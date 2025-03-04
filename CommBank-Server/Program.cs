@@ -5,7 +5,6 @@ using MongoDB.Driver;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -31,6 +30,15 @@ builder.Services.AddSingleton(usersService);
 builder.Services.AddCors();
 
 var app = builder.Build();
+
+// Run Database Seeder
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var configuration = services.GetRequiredService<IConfiguration>();
+    var seeder = new DatabaseSeeder(configuration);
+    await seeder.SeedData();
+}
 
 app.UseCors(builder => builder
    .AllowAnyOrigin()
